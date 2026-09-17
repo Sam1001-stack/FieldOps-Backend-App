@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: fieldops
+      POSTGRES_USER: fieldops
+      POSTGRES_PASSWORD: fieldops
+    ports:
+      - "5432:5432"
+    volumes:
+      - fieldops_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U fieldops -d fieldops"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      PORT: "8000"
+      APP_NAME: FieldOps
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8000
+      # Local-only key. Generate a real one for Render: php artisan key:generate --show
+      APP_KEY: base64:ZmllbGRvcHMtbG9jYWwtZG9ja2VyLWtleS0zMmJ5
+      DB_CONNECTION: pgsql
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_DATABASE: fieldops
+      DB_USERNAME: fieldops
+      DB_PASSWORD: fieldops
+      DB_SSLMODE: disable
+      FRONTEND_URL: http://localhost:5173
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+      LOG_CHANNEL: stderr
+      RUN_MIGRATIONS: "true"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  fieldops_pg:

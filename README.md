@@ -37,6 +37,21 @@ php artisan serve --host=127.0.0.1 --port=8000
 
 PostgreSQL: set `DB_CONNECTION=pgsql`, `DB_SSLMODE=disable` on Windows if SSL handshake hangs. Pest always uses sqlite in-memory (`phpunit.xml`).
 
+## Docker (Render)
+
+Render has no native PHP runtime. The API image in `Dockerfile` runs Apache + PHP 8.3 and listens on `$PORT`.
+
+```powershell
+cd server
+docker compose up --build
+```
+
+API: `http://localhost:8000` · health: `http://localhost:8000/up`
+
+On Render: Web Service → Docker → Root Directory `server`. Set `APP_KEY` (`php artisan key:generate --show`), `FRONTEND_URL`, and link a PostgreSQL database (`DATABASE_URL`). Optional Blueprint: repo-root `render.yaml`.
+
+## Tests
+
 ```powershell
 php artisan test
 ```
