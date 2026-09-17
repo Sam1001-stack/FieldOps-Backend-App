@@ -50,6 +50,15 @@ API: `http://localhost:8000` · health: `http://localhost:8000/up`
 
 On Render: Web Service → Docker → Root Directory `server`. Set `APP_KEY` (`php artisan key:generate --show`), `FRONTEND_URL`, and link a PostgreSQL database (`DATABASE_URL`). Optional Blueprint: repo-root `render.yaml`.
 
+Live Super Admin (from this machine, against Render Postgres):
+
+```powershell
+cd server
+.\scripts\ensure-live-admin.ps1
+```
+
+Puts `DATABASE_URL` in gitignored `server/.env.live` (see `.env.live.example`). Use Render's **External** Database URL, not Internal.
+
 ## Tests
 
 ```powershell
