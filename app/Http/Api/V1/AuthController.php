@@ -1,0 +1,105 @@
+<?php
+
+namespace App\Http\Api\V1;
+
+use App\Application\Identity\AttachMember;
+use App\Domain\CRM\Site;
+use App\Domain\Identity\User;
+use App\Domain\Organization\Organization;
+use App\Enums\UserRole;
+use App\Http\Resources\UserResource;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * Login, customer register, logout, GET /me.
+ * Register creates a pending customer; office must verify before job create.
+ */
+class AuthController
+{
+    public function login(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string'],
+        ]);
+
+        if (! Auth::attempt($data)) {
+            throw ValidationException::withMessages([
+                'email' => ['Anmeldung fehlgeschlagen.'],
+            ]);
+        }
+
+        $user = $request->user();
+        $user->tokens()->where('name', 'fieldops')->delete();
+        $token = $user->createToken('fieldops')->plainTextToken;
+
+        return [
+            'token' => $token,
+            'user' => new UserResource($user->load(['currentOrganization', 'customerProfile'])),
+        ];
+    }
+
+    public function register(Request $request, AttachMember $attach)
+    {
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:120'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
+            'phone' => ['nullable', 'string', 'max:40'],
+            'street' => ['required', 'string', 'max:180'],
+            'zip' => ['required', 'string', 'max:16'],
+            'city' => ['required', 'string', 'max:80'],
+            'organization_id' => ['nullable', 'uuid'],
+        ]);
+
+        $org = ! empty($data['organization_id'])
+            ? Organization::query()->where('public_id', $data['organization_id'])->where('suspended', false)->first()
+            : Organization::query()->where('suspended', false)->orderBy('id')->first();
+
+        abort_unless($org, 422, 'Kein Handwerksbetrieb verfügbar.');
+
+        $user = User::query()->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'phone' => $data['phone'] ?? null,
+            'current_organization_id' => $org->id,
+        ]);
+
+        $attach->handle($org, $user, UserRole::Customer);
+
+        $customer = $user->customerProfile()->first();
+        if ($customer) {
+            Site::query()->create([
+                'organization_id' => $org->id,
+                'customer_id' => $customer->id,
+                'street' => $data['street'],
+                'zip' => $data['zip'],
+                'city' => $data['city'],
+            ]);
+        }
+
+        $user->tokens()->where('name', 'fieldops')->delete();
+        $token = $user->createToken('fieldops')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => new UserResource($user->load(['currentOrganization', 'customerProfile'])),
+            'message' => 'Konto angelegt. Das Büro bestätigt Sie in Kürze.',
+        ], 201);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()?->currentAccessToken()?->delete();
+
+        return response()->json(['message' => 'Abgemeldet.']);
+    }
+
+    public function me(Request $request)
+    {
+        return new UserResource($request->user()->load(['currentOrganization', 'customerProfile']));
+    }
+}
