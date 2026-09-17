@@ -15,6 +15,7 @@ use App\Http\Api\V1\ContentController;
 use App\Http\Api\V1\CustomerController;
 use App\Http\Api\V1\DispatchController;
 use App\Http\Api\V1\FieldController;
+use App\Http\Api\V1\HealthController;
 use App\Http\Api\V1\InvitationController;
 use App\Http\Api\V1\InvoiceController;
 use App\Http\Api\V1\JobController;
@@ -25,6 +26,8 @@ use App\Http\Api\V1\PlatformController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function (): void {
+    Route::get('health', HealthController::class);
+
     Route::middleware('throttle:auth')->group(function (): void {
         Route::post('auth/login', [AuthController::class, 'login']);
         Route::post('auth/register', [AuthController::class, 'register']);
