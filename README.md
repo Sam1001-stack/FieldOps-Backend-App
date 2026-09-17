@@ -39,7 +39,7 @@ PostgreSQL: set `DB_CONNECTION=pgsql`, `DB_SSLMODE=disable` on Windows if SSL ha
 
 ## Docker (Render)
 
-Render has no native PHP runtime. The API image in `Dockerfile` runs Apache + PHP 8.3 and listens on `$PORT`.
+Render has no native PHP runtime. The API image in `Dockerfile` runs Apache + PHP 8.4 and listens on `$PORT`.
 
 ```powershell
 cd server
