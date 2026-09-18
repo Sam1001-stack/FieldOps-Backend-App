@@ -51,14 +51,15 @@ class AuthController
             'street' => ['required', 'string', 'max:180'],
             'zip' => ['required', 'string', 'max:16'],
             'city' => ['required', 'string', 'max:80'],
-            'organization_id' => ['nullable', 'uuid'],
+            'organization_id' => ['required', 'uuid'],
         ]);
 
-        $org = ! empty($data['organization_id'])
-            ? Organization::query()->where('public_id', $data['organization_id'])->where('suspended', false)->first()
-            : Organization::query()->where('suspended', false)->orderBy('id')->first();
+        $org = Organization::query()
+            ->where('public_id', $data['organization_id'])
+            ->where('suspended', false)
+            ->first();
 
-        abort_unless($org, 422, 'Kein Handwerksbetrieb verfügbar.');
+        abort_unless($org, 422, 'Handwerksbetrieb nicht gefunden oder gesperrt.');
 
         $user = User::query()->create([
             'name' => $data['name'],

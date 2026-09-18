@@ -11,6 +11,7 @@ use Database\Seeders\DatabaseSeeder;
 
 it('blocks unverified customers from creating jobs until office confirms', function () {
     $this->seed(DatabaseSeeder::class);
+    $orgId = \App\Domain\Organization\Organization::query()->firstOrFail()->public_id;
 
     $register = $this->postJson('/api/v1/auth/register', [
         'name' => 'Neu Kunde',
@@ -20,6 +21,7 @@ it('blocks unverified customers from creating jobs until office confirms', funct
         'street' => 'Neue Straße 1',
         'zip' => '60311',
         'city' => 'Frankfurt am Main',
+        'organization_id' => $orgId,
     ])->assertCreated();
 
     $token = $register->json('token');

@@ -7,6 +7,20 @@ use Illuminate\Http\Request;
 
 class OrganizationController extends Controller
 {
+    /** Public list for customer self-registration (Betrieb picker). */
+    public function publicIndex()
+    {
+        return Organization::query()
+            ->where('suspended', false)
+            ->orderBy('name')
+            ->get(['public_id', 'name'])
+            ->map(fn (Organization $org) => [
+                'id' => $org->public_id,
+                'name' => $org->name,
+            ])
+            ->values();
+    }
+
     public function settings(Request $request)
     {
         $org = $request->user()->currentOrganization;

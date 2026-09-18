@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('invitations/accept', [InvitationController::class, 'accept']);
     });
 
+    Route::get('organizations', [OrganizationController::class, 'publicIndex']);
     Route::get('content', [ContentController::class, 'index']);
     Route::get('content/{page}', [ContentController::class, 'show']);
 
@@ -100,6 +101,7 @@ Route::prefix('v1')->group(function (): void {
         Route::post('platform/impersonate', [PlatformController::class, 'impersonate']);
         Route::get('platform/health', [PlatformController::class, 'health']);
         Route::get('platform/content', [ContentController::class, 'adminIndex']);
+        Route::post('platform/content/seed', [ContentController::class, 'seedDefaults']);
         Route::put('platform/content/{page}', [ContentController::class, 'upsert']);
     });
 });

@@ -17,7 +17,9 @@ class JobController extends Controller
         $this->authorize('viewAny', ServiceJob::class);
         $user = $request->user();
 
-        $query = ServiceJob::query()->with(['customer', 'site', 'assignees', 'photos']);
+        $query = ServiceJob::query()->with([
+            'customer', 'site', 'assignees', 'photos', 'materials.catalogItem', 'timeEntries',
+        ]);
 
         if ($user->roleIn() === UserRole::Monteur) {
             $query->whereHas('assignees', fn ($q) => $q->where('users.id', $user->id));

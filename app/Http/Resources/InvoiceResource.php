@@ -23,7 +23,7 @@ class InvoiceResource extends JsonResource
             'subtotal_cents' => $this->subtotal_cents,
             'tax_cents' => $this->tax_cents,
             'total_cents' => $this->total_cents,
-            'pdf_url' => $this->pdf_path ? Storage::disk('public')->url($this->pdf_path) : null,
+            'pdf_url' => $this->pdf_path ? url(Storage::disk('public')->url($this->pdf_path)) : null,
             'customer' => $this->whenLoaded('customer', fn () => [
                 'name' => $this->customer->name,
             ]),

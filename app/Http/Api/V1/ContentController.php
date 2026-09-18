@@ -72,6 +72,19 @@ class ContentController extends Controller
         return $this->payload($page->fresh('editor'), false);
     }
 
+    /** Bootstrap Datenschutz / FAQ / AGB when LIVE has zero CMS pages. */
+    public function seedDefaults(Request $request)
+    {
+        abort_unless($request->user()?->is_super_admin, 403);
+
+        (new \Database\Seeders\ContentPageSeeder)->run();
+
+        return ContentPage::query()
+            ->orderBy('sort_order')
+            ->get()
+            ->map(fn (ContentPage $page) => $this->payload($page, false));
+    }
+
     /**
      * @return array<string, mixed>
      */

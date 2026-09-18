@@ -6,6 +6,8 @@ use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -47,11 +49,36 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $exceptions->render(function (HttpException $e, Request $request) {
             if ($request->is('api/*')) {
+                $message = $e->getMessage() ?: 'Fehler';
+                if ($message === 'This action is unauthorized.') {
+                    $message = 'Keine Berechtigung für diese Aktion.';
+                }
+
                 return response()->json([
-                    'message' => $e->getMessage() ?: 'Fehler',
+                    'message' => $message,
                     'errors' => [],
                     'code' => 'http',
                 ], $e->getStatusCode());
+            }
+        });
+
+        $exceptions->render(function (AuthorizationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Keine Berechtigung für diese Aktion.',
+                    'errors' => [],
+                    'code' => 'http',
+                ], 403);
+            }
+        });
+
+        $exceptions->render(function (AuthenticationException $e, Request $request) {
+            if ($request->is('api/*')) {
+                return response()->json([
+                    'message' => 'Nicht angemeldet.',
+                    'errors' => [],
+                    'code' => 'http',
+                ], 401);
             }
         });
 
