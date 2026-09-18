@@ -12,6 +12,7 @@ enum NotificationType: string
     case OfficeRejected = 'office.rejected';
     case JobCreated = 'job.created';
     case JobAssigned = 'job.assigned';
+    case JobUnassigned = 'job.unassigned';
     case JobStatus = 'job.status';
 
     public function label(): string
@@ -25,6 +26,7 @@ enum NotificationType: string
             self::OfficeRejected => 'Büro abgelehnt',
             self::JobCreated => 'Neuer Einsatz',
             self::JobAssigned => 'Einsatz zugewiesen',
+            self::JobUnassigned => 'Zuweisung aufgehoben',
             self::JobStatus => 'Status aktualisiert',
         };
     }

@@ -51,6 +51,7 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('dispatch/board', [DispatchController::class, 'board']);
         Route::post('jobs/{job}/assign', [DispatchController::class, 'assign']);
+        Route::post('jobs/{job}/unassign', [DispatchController::class, 'unassign']);
 
         Route::get('customers', [CustomerController::class, 'index']);
         Route::post('customers', [CustomerController::class, 'store']);

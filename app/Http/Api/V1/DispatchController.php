@@ -4,6 +4,7 @@ namespace App\Http\Api\V1;
 
 use App\Application\Dispatch\AssignJob;
 use App\Application\Dispatch\GetDispatchBoard;
+use App\Application\Dispatch\UnassignJob;
 use App\Domain\Identity\User;
 use App\Domain\Jobs\ServiceJob;
 use App\Http\Resources\JobResource;
@@ -44,6 +45,14 @@ class DispatchController extends Controller
 
         $monteur = User::query()->where('public_id', $data['monteur_id'])->firstOrFail();
         $job = $action->handle($job, $monteur, $request->user());
+
+        return new JobResource($job);
+    }
+
+    public function unassign(Request $request, ServiceJob $job, UnassignJob $action)
+    {
+        $this->authorize('dispatch', ServiceJob::class);
+        $job = $action->handle($job, $request->user());
 
         return new JobResource($job);
     }
