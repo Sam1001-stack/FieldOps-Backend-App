@@ -17,9 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
-        $middleware->statefulApi();
+        // Bearer tokens (web SPA + both RN apps). Do not enable statefulApi():
+        // that copies CSRF onto /api/* for SANCTUM_STATEFUL_DOMAINS and breaks
+        // browser login (419) while Postman still works.
         $middleware->validateCsrfTokens(except: [
             'stripe/*',
+            'api/*',
         ]);
         $middleware->alias([
             'org' => SetCurrentOrganization::class,
