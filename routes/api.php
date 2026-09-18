@@ -86,7 +86,7 @@ Route::prefix('v1')->group(function (): void {
 
         Route::get('organization/members', [MemberController::class, 'index']);
         Route::get('organization/members/logs', [MemberController::class, 'logs']);
-        Route::post('organization/members', [MemberController::class, 'store']);
+        Route::post('organization/members', [MemberController::class, 'store'])->middleware('plan:users');
         Route::put('organization/members/{member}', [MemberController::class, 'update']);
         Route::delete('organization/members/{member}', [MemberController::class, 'destroy']);
         Route::post('organization/members/{member}/approve', [MemberController::class, 'approve']);
@@ -94,6 +94,7 @@ Route::prefix('v1')->group(function (): void {
         Route::get('platform/overview', [PlatformController::class, 'overview']);
         Route::post('platform/switch-organization', [PlatformController::class, 'switchOrganization']);
         Route::get('platform/organizations', [PlatformController::class, 'organizations']);
+        Route::post('platform/organizations', [PlatformController::class, 'store']);
         Route::post('platform/organizations/{organization}/suspend', [PlatformController::class, 'suspend']);
         Route::post('platform/impersonate', [PlatformController::class, 'impersonate']);
         Route::get('platform/health', [PlatformController::class, 'health']);

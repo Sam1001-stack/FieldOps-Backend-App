@@ -22,7 +22,7 @@ final class AssignJob
         abort_unless($organization, 422, 'Mandant fehlt.');
 
         if ($monteur->roleIn($organization) !== UserRole::Monteur) {
-            throw new DomainException('Only Monteure can be assigned to jobs.');
+            throw new DomainException('Nur Monteure können Einsätzen zugewiesen werden.');
         }
 
         $job->assignees()->syncWithoutDetaching([$monteur->id => ['organization_id' => $job->organization_id]]);

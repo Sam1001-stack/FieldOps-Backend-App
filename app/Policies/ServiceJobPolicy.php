@@ -43,7 +43,8 @@ class ServiceJobPolicy
         }
 
         return match ($user->roleIn()) {
-            UserRole::Owner, UserRole::Office => true,
+            UserRole::Owner => true,
+            UserRole::Office => $user->isOfficeApproved(),
             UserRole::Monteur => $job->isAssignedTo($user),
             UserRole::Customer => $job->customer?->user_id === $user->id,
             default => false,

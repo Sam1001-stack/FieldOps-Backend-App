@@ -8,7 +8,7 @@ it('exposes a public health url without auth', function () {
         ->assertJsonPath('ok', true)
         ->assertJsonPath('database', 'ok')
         ->assertJsonPath('url', 'https://fieldops-api.onrender.com')
-        ->assertJsonStructure(['ok', 'status', 'app', 'env', 'url', 'database']);
+        ->assertJsonStructure(['ok', 'status', 'app', 'env', 'url', 'public_url', 'database']);
 
     $this->getJson('/health')
         ->assertOk()

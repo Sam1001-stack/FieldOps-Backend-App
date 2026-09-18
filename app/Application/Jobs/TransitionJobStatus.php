@@ -20,11 +20,11 @@ final class TransitionJobStatus
             ? UserRole::SuperAdmin
             : $actor->roleIn($job->organization);
         if (! $role) {
-            throw new DomainException('No role in this organization.');
+            throw new DomainException('Keine Rolle in diesem Mandanten.');
         }
 
         if (! $actor->is_super_admin && $actor->hasOrgRole(UserRole::Monteur, $job->organization) && ! $job->isAssignedTo($actor)) {
-            throw new DomainException('Monteur can only update assigned jobs.');
+            throw new DomainException('Monteure dürfen nur zugewiesene Einsätze aktualisieren.');
         }
 
         JobStatusMachine::assert($job->status, $to, $role);

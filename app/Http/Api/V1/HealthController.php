@@ -11,6 +11,7 @@ class HealthController
     public function __invoke(Request $request): JsonResponse
     {
         $url = rtrim((string) config('app.url'), '/');
+        $publicUrl = rtrim($request->getSchemeAndHttpHost(), '/');
         $requested = $request->query('url', $request->query('backendurl'));
         $requested = is_string($requested) && $requested !== '' ? rtrim($requested, '/') : null;
 
@@ -30,12 +31,14 @@ class HealthController
             'app' => config('app.name'),
             'env' => config('app.env'),
             'url' => $url,
+            'public_url' => $publicUrl,
             'database' => $database,
         ];
 
         if ($requested !== null) {
             $payload['requested_url'] = $requested;
-            $payload['url_matches'] = strcasecmp($requested, $url) === 0;
+            $payload['url_matches'] = strcasecmp($requested, $url) === 0
+                || strcasecmp($requested, $publicUrl) === 0;
         }
 
         return response()->json($payload, $ok ? 200 : 503);

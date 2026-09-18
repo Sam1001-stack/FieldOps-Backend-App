@@ -33,7 +33,6 @@ class AuthController
         }
 
         $user = $request->user();
-        $user->tokens()->where('name', 'fieldops')->delete();
         $token = $user->createToken('fieldops')->plainTextToken;
 
         return [
@@ -82,7 +81,6 @@ class AuthController
             ]);
         }
 
-        $user->tokens()->where('name', 'fieldops')->delete();
         $token = $user->createToken('fieldops')->plainTextToken;
 
         return response()->json([
@@ -128,7 +126,6 @@ class AuthController
             ],
         );
 
-        $user->tokens()->where('name', 'fieldops')->delete();
         $token = $user->createToken('fieldops')->plainTextToken;
 
         return response()->json([

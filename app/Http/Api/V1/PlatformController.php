@@ -2,6 +2,7 @@
 
 namespace App\Http\Api\V1;
 
+use App\Application\Organization\CreateOrganization;
 use App\Domain\Identity\User;
 use App\Domain\Invoicing\Invoice;
 use App\Domain\Jobs\ServiceJob;
@@ -18,6 +19,25 @@ class PlatformController
         abort_unless($request->user()?->is_super_admin, 403);
 
         return $this->organizationPayload();
+    }
+
+    public function store(Request $request, CreateOrganization $create)
+    {
+        abort_unless($request->user()?->is_super_admin, 403);
+        $data = $request->validate([
+            'name' => ['required', 'string', 'max:180'],
+            'street' => ['nullable', 'string', 'max:180'],
+            'zip' => ['nullable', 'string', 'max:16'],
+            'city' => ['nullable', 'string', 'max:80'],
+            'owner_name' => ['required', 'string', 'max:120'],
+            'owner_email' => ['required', 'email', 'unique:users,email'],
+            'owner_password' => ['required', 'string', 'min:8'],
+        ]);
+
+        $org = $create->handle($request->user(), $data);
+        $payload = $this->organizationPayload()->firstWhere('id', $org->public_id);
+
+        return response()->json($payload, 201);
     }
 
     public function overview(Request $request)

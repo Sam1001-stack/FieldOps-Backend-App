@@ -74,7 +74,10 @@ class JobController extends Controller
             'status' => ['required', 'string'],
         ]);
 
-        $job = $action->handle($job, JobStatus::from($data['status']), $request->user());
+        $status = JobStatus::tryFrom($data['status']);
+        abort_unless($status, 422, 'Ungültiger Status.');
+
+        $job = $action->handle($job, $status, $request->user());
 
         return new JobResource($job->load(['customer', 'site', 'assignees', 'photos', 'checklistItems']));
     }

@@ -37,5 +37,7 @@
         <env name="STRIPE_SECRET" value=""/>
         <env name="CASHIER_CURRENCY" value="eur"/>
         <env name="FRONTEND_URL" value="http://localhost:5173"/>
+        <env name="APP_LOCALE" value="de"/>
+        <env name="APP_FALLBACK_LOCALE" value="de"/>
     </php>
 </phpunit>

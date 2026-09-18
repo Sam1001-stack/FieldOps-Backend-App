@@ -31,11 +31,11 @@ final class JobStatusMachine
     public static function assert(JobStatus $from, JobStatus $to, UserRole $role): void
     {
         if ($from === JobStatus::Invoiced) {
-            throw new DomainException('Invoiced jobs cannot change status.');
+            throw new DomainException('Berechnete Einsätze können nicht mehr geändert werden.');
         }
 
         if ($from === JobStatus::Cancelled && ! (in_array($role, [UserRole::Owner, UserRole::SuperAdmin], true) && $to === JobStatus::Draft)) {
-            throw new DomainException('Cancelled jobs can only be reopened to draft by the owner.');
+            throw new DomainException('Stornierte Einsätze darf nur der Inhaber wieder auf Entwurf setzen.');
         }
 
         $allowed = self::allowed($from, $role);
@@ -44,7 +44,7 @@ final class JobStatusMachine
         }
 
         if (! in_array($to, $allowed, true)) {
-            throw new DomainException("Transition {$from->value} → {$to->value} is not allowed for {$role->value}.");
+            throw new DomainException("Statuswechsel {$from->label()} → {$to->label()} ist für {$role->label()} nicht erlaubt.");
         }
     }
 

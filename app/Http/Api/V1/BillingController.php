@@ -12,7 +12,7 @@ class BillingController extends Controller
     public function show(Request $request)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('view', $org);
 
         $plans = collect(config('billing.plans', []))->map(fn (array $plan, string $id) => [
@@ -31,7 +31,7 @@ class BillingController extends Controller
     public function checkout(Request $request, StartStripeCheckout $start)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('billing', $org);
 
         $data = $request->validate([
@@ -50,7 +50,7 @@ class BillingController extends Controller
     public function sync(Request $request, SyncStripeCheckout $sync)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('billing', $org);
 
         $data = $request->validate([

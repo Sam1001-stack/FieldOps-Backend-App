@@ -20,7 +20,7 @@ class MemberController extends Controller
     public function index(Request $request)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('view', $org);
 
         $query = $org->users();
@@ -35,7 +35,7 @@ class MemberController extends Controller
     public function logs(Request $request)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('view', $org);
 
         $data = $request->validate([
@@ -193,7 +193,7 @@ class MemberController extends Controller
     public function store(Request $request, AttachMember $attach)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('update', $org);
 
         $data = $request->validate([
@@ -234,7 +234,7 @@ class MemberController extends Controller
     public function update(Request $request, User $member, AttachMember $attach)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('update', $org);
 
         $data = $request->validate([
@@ -264,7 +264,7 @@ class MemberController extends Controller
     public function destroy(Request $request, User $member)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('update', $org);
         abort_if($member->is($request->user()), 422, 'Eigenes Konto kann nicht entfernt werden.');
 
@@ -284,7 +284,7 @@ class MemberController extends Controller
     public function approve(Request $request, User $member)
     {
         $org = $request->user()->currentOrganization;
-        abort_unless($org, 404);
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('approveOffice', $org);
 
         $data = $request->validate([

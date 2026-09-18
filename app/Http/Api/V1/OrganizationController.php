@@ -10,6 +10,7 @@ class OrganizationController extends Controller
     public function settings(Request $request)
     {
         $org = $request->user()->currentOrganization;
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('view', $org);
 
         return $org->settings;
@@ -18,6 +19,7 @@ class OrganizationController extends Controller
     public function updateSettings(Request $request)
     {
         $org = $request->user()->currentOrganization;
+        abort_unless($org, 422, 'Kein Mandant ausgewählt.');
         $this->authorize('update', $org);
         $data = $request->validate([
             'legal_name' => ['nullable', 'string'],
