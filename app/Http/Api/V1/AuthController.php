@@ -10,6 +10,7 @@ use App\Enums\UserRole;
 use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -88,6 +89,52 @@ class AuthController
             'token' => $token,
             'user' => new UserResource($user->load(['currentOrganization', 'customerProfile'])),
             'message' => 'Konto angelegt. Das Büro bestätigt Sie in Kürze.',
+        ], 201);
+    }
+
+    public function registerSuperAdmin(Request $request)
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required', 'string', 'min:8'],
+            'role' => ['required', Rule::enum(UserRole::class)],
+            'name' => ['nullable', 'string', 'max:120'],
+        ]);
+
+        abort_unless(
+            UserRole::from($data['role']) === UserRole::SuperAdmin,
+            422,
+            'Nur die Rolle super_admin ist erlaubt.',
+        );
+
+        $actor = Auth::guard('sanctum')->user();
+        $hasSuperAdmin = User::query()->where('is_super_admin', true)->exists();
+
+        if ($hasSuperAdmin && ! $actor?->is_super_admin) {
+            abort(403, 'Ein Super-Admin existiert bereits. Melden Sie sich an, um weitere anzulegen.');
+        }
+
+        $existing = User::query()->where('email', $data['email'])->first();
+        if ($existing && ! $existing->is_super_admin) {
+            abort(422, 'E-Mail bereits vergeben.');
+        }
+
+        $user = User::query()->updateOrCreate(
+            ['email' => $data['email']],
+            [
+                'name' => $data['name'] ?? 'FieldOps Admin',
+                'password' => $data['password'],
+                'is_super_admin' => true,
+            ],
+        );
+
+        $user->tokens()->where('name', 'fieldops')->delete();
+        $token = $user->createToken('fieldops')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user' => new UserResource($user->load(['currentOrganization', 'customerProfile'])),
+            'message' => 'Super-Admin angelegt.',
         ], 201);
     }
 

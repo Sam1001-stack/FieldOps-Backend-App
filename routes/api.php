@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function (): void {
     Route::middleware('throttle:auth')->group(function (): void {
         Route::post('auth/login', [AuthController::class, 'login']);
         Route::post('auth/register', [AuthController::class, 'register']);
+        Route::post('auth/super-admin', [AuthController::class, 'registerSuperAdmin']);
         Route::post('invitations/accept', [InvitationController::class, 'accept']);
     });
 
