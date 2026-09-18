@@ -65,7 +65,7 @@ class PlatformController
             $activity = DB::table('activity_log as a')
                 ->leftJoin('users as u', 'u.id', '=', 'a.causer_id')
                 ->orderByDesc('a.id')
-                ->limit(25)
+                ->limit(5)
                 ->get(['a.description', 'a.created_at', 'u.name as actor', 'a.properties']);
         }
 
